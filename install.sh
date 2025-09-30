@@ -330,13 +330,13 @@ install_swiftbar_plugin() {
     # Create SwiftBar plugins directory
     mkdir -p "$SWIFTBAR_PLUGINS_DIR"
 
-    # Copy plugin file (3s refresh rate for balanced performance)
-    cp "$SCRIPT_DIR/plugins/claude_monitor.3s.sh" "$SWIFTBAR_PLUGINS_DIR/"
-    chmod +x "$SWIFTBAR_PLUGINS_DIR/claude_monitor.3s.sh"
+    # Copy plugin file (1s refresh rate for smooth animation)
+    cp "$SCRIPT_DIR/plugins/claude_monitor.1s.sh" "$SWIFTBAR_PLUGINS_DIR/"
+    chmod +x "$SWIFTBAR_PLUGINS_DIR/claude_monitor.1s.sh"
 
     # Update plugin to use correct status manager path
     sed -i '' "s|readonly STATUS_MANAGER=\".*\"|readonly STATUS_MANAGER=\"$CLAUDE_MONITOR_DIR/lib/status_manager.sh\"|" \
-        "$SWIFTBAR_PLUGINS_DIR/claude_monitor.3s.sh"
+        "$SWIFTBAR_PLUGINS_DIR/claude_monitor.1s.sh"
 
     log_success "SwiftBar plugin installed"
 }
@@ -389,7 +389,7 @@ show_summary() {
     echo "  • Installation scope: $INSTALL_SCOPE"
     echo "  • Status manager: $CLAUDE_MONITOR_DIR/lib/status_manager.sh"
     echo "  • Hooks script: $CLAUDE_CONFIG_DIR/hooks/update_status.sh"
-    echo "  • SwiftBar plugin: $SWIFTBAR_PLUGINS_DIR/claude_monitor.3s.sh"
+    echo "  • SwiftBar plugin: $SWIFTBAR_PLUGINS_DIR/claude_monitor.1s.sh"
     echo "  • SwiftBar manager: $CLAUDE_MONITOR_DIR/scripts/swiftbar_manager.sh"
     echo "  • Configuration: $CLAUDE_SETTINGS_FILE"
     echo
@@ -418,7 +418,7 @@ test_installation() {
     fi
 
     # Test SwiftBar plugin
-    if [[ -f "$SWIFTBAR_PLUGINS_DIR/claude_monitor.3s.sh" ]]; then
+    if [[ -f "$SWIFTBAR_PLUGINS_DIR/claude_monitor.1s.sh" ]]; then
         log_success "SwiftBar plugin installed"
     else
         log_warning "SwiftBar plugin not found - check SwiftBar installation"

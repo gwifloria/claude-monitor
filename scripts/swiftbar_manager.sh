@@ -92,7 +92,7 @@ start_swiftbar() {
 
 # Verify plugin is loaded
 verify_plugin() {
-    local plugin_path="$HOME/Library/Application Support/SwiftBar/claude_monitor.3s.sh"
+    local plugin_path="$HOME/Library/Application Support/SwiftBar/claude_monitor.1s.sh"
 
     if [[ -f "$plugin_path" ]]; then
         log_success "ClaudeCode Monitor plugin found"

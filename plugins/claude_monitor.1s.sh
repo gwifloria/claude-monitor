@@ -35,23 +35,23 @@ get_attention_display() {
 
 # Get animated loading icon for processing status
 get_loading_animation() {
-    # Get current timestamp in milliseconds using Perl (macOS compatible)
-    # Animation is independent of SwiftBar refresh rate
-    local milliseconds=$(perl -MTime::HiRes=time -e 'printf "%.0f", time()*1000')
+    # Get current timestamp in seconds using Perl (macOS compatible)
+    # Animation syncs with SwiftBar 1s refresh rate
+    local seconds=$(perl -MTime::HiRes=time -e 'printf "%.0f", time()')
 
-    # Calculate which frame to show (5 frames, 200ms per frame = 1 second per rotation)
-    # This ensures smooth animation even with 3s or 30s SwiftBar refresh intervals
-    local frame=$(((milliseconds / 200) % 5))
+    # Calculate which frame to show (6 frames, 1 second per frame = 6 seconds per rotation)
+    # Each transition keeps one dot fixed and moves two dots
+    local frame=$(((seconds) % 6))
 
-    # Continuous clockwise rotation using 3-dot braille patterns
-    # Each frame shows 3 dots forming a rotating arc
+    # Smooth clockwise rotation: each frame keeps one "anchor" dot unchanged
     # Braille grid: [0,0]=⠁ [1,0]=⠈ [0,1]=⠂ [1,1]=⠐ [0,2]=⠄ [1,2]=⠠
     case $frame in
-        0) echo "⠇" ;;  # Left side: [0,0]+[0,1]+[0,2]
-        1) echo "⠆" ;;  # Bottom: [0,1]+[0,2]+[1,2]
-        2) echo "⠴" ;;  # Right side: [0,2]+[1,2]+[1,1]
-        3) echo "⠸" ;;  # Right-top: [1,2]+[1,1]+[1,0]
-        4) echo "⠉" ;;  # Top: [1,0]+[0,0]+[0,1]
+        0) echo "⠇" ;;  # [0,0][0,1][0,2] - Left column
+        1) echo "⠦" ;;  # [0,1][0,2][1,2] - Bottom-left arc
+        2) echo "⠴" ;;  # [0,2][1,2][1,1] - Bottom-right arc
+        3) echo "⠸" ;;  # [1,2][1,1][1,0] - Right column
+        4) echo "⠙" ;;  # [1,1][1,0][0,0] - Top-right arc
+        5) echo "⠋" ;;  # [1,0][0,0][0,1] - Top-left arc
     esac
 }
 

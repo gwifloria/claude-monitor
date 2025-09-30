@@ -2,6 +2,60 @@
 
 This file provides guidance to Claude Code when working with code in this repository.
 
+## Important: Code Hygiene Rules
+
+**CRITICAL**: When modifying or refactoring code in this repository, you MUST:
+
+1. **Delete obsolete files** - Never leave renamed/replaced files behind
+2. **Update all references** - Search and replace ALL occurrences (use `grep -rn "old_name"`)
+3. **Verify installation** - Test `./install.sh` after changes to ensure no broken paths
+4. **Clean residual code** - Remove unused functions, variables, and comments
+5. **Clean up before finishing** - ALWAYS run cleanup commands at the end of your session
+
+**Example**: If renaming `file.3s.sh` → `file.1s.sh`, you must:
+- Delete `file.3s.sh` immediately after creating `file.1s.sh`
+- Update ALL scripts that reference it (install.sh, uninstall.sh, docs, etc.)
+- Test installation to catch any missed references
+
+### Session Cleanup Protocol
+
+**MANDATORY**: At the end of EVERY work session, run these cleanup commands:
+
+```bash
+# 1. Clean expired sessions
+~/.claude-monitor/lib/status_manager.sh clean
+
+# 2. Reset session state (removes all monitoring data)
+rm ~/.claude-monitor/sessions.json && echo '{}' > ~/.claude-monitor/sessions.json
+
+# 3. Remove duplicate/test plugins from SwiftBar Plugins directory
+rm -rf ~/Library/Application\ Support/SwiftBar/Plugins/claude*
+rm -rf ~/Library/Application\ Support/SwiftBar/Plugins/cc_*
+
+# 4. Verify clean state
+~/.claude-monitor/lib/status_manager.sh summary
+# Expected output: "idle|0|0|0|0"
+
+# 5. Restart SwiftBar to apply cleanup
+~/.claude-monitor/scripts/swiftbar_manager.sh restart
+```
+
+**Why this matters**:
+- **Session state**: Each ClaudeCode session creates monitoring state that persists
+- **Plugin duplication**: SwiftBar loads plugins from both root AND `Plugins/` subdirectory
+- **Test artifacts**: Development creates multiple plugin versions (1s, 3s, 30s, etc.)
+
+Without cleanup you'll see:
+- Multiple duplicate monitors in menu bar (one per plugin file)
+- Conflicting animations (some clockwise, some counter-clockwise from old code)
+- Stale session data causing incorrect status display
+
+**When to clean**:
+- ✅ After completing development tasks
+- ✅ Before testing installation/features
+- ✅ When user reports duplicate monitors
+- ✅ At the end of EVERY conversation with the user
+
 ## Project Overview
 
 **claude-monitor** is a macOS menu bar monitoring tool that integrates with ClaudeCode through its hooks system to display real-time status updates via SwiftBar.
@@ -17,7 +71,7 @@ Reduces attention fragmentation when working with ClaudeCode by providing at-a-g
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    SwiftBar Menu Bar                     │
-│         (claude_monitor.3s.sh - UI Display)              │
+│         (claude_monitor.1s.sh - UI Display)              │
 └────────────────────┬────────────────────────────────────┘
                      │ reads status
                      ▼
@@ -73,7 +127,7 @@ claude-monitor/
 ├── hooks/
 │   └── update_status.sh            # ClaudeCode hook handler
 ├── plugins/
-│   └── claude_monitor.3s.sh        # SwiftBar menu bar plugin (3s refresh)
+│   └── claude_monitor.1s.sh        # SwiftBar menu bar plugin (1s refresh)
 ├── scripts/
 │   ├── swiftbar_manager.sh         # SwiftBar process management
 │   └── generate_settings.sh        # Configuration generator
@@ -95,7 +149,7 @@ Installed Locations:
   └── hooks/update_status.sh        # Copied from project
 
 ~/Library/Application Support/SwiftBar/
-  └── claude_monitor.3s.sh          # SwiftBar plugin
+  └── claude_monitor.1s.sh          # SwiftBar plugin
 ```
 
 ## Development Commands
@@ -134,7 +188,7 @@ export CLAUDE_MONITOR_DEBUG=1
 tail -f ~/.claude-monitor/debug.log
 
 # Test SwiftBar plugin directly
-~/.local/share/SwiftBar/claude_monitor.3s.sh
+~/Library/Application\ Support/SwiftBar/claude_monitor.1s.sh
 ```
 
 ### Development Workflow
@@ -145,7 +199,7 @@ When modifying code during development:
 # After editing source files, sync to installed location
 cp hooks/update_status.sh ~/.claude/hooks/
 cp lib/status_manager.sh ~/.claude-monitor/lib/
-cp plugins/claude_monitor.3s.sh ~/Library/Application\ Support/SwiftBar/
+cp plugins/claude_monitor.1s.sh ~/Library/Application\ Support/SwiftBar/
 
 # Restart SwiftBar to see changes
 ~/.claude-monitor/scripts/swiftbar_manager.sh restart
@@ -225,7 +279,7 @@ cat ~/.claude/settings.json | jq .hooks
 
 **Menu bar icon not appearing**
 1. Verify SwiftBar is installed and running
-2. Check plugin file exists and is executable: `ls -l ~/Library/Application\ Support/SwiftBar/claude_monitor.3s.sh`
+2. Check plugin file exists and is executable: `ls -l ~/Library/Application\ Support/SwiftBar/claude_monitor.1s.sh`
 3. Restart SwiftBar: `~/.claude-monitor/scripts/swiftbar_manager.sh restart`
 
 **Status not updating when using ClaudeCode**
