@@ -1,5 +1,7 @@
 # ClaudeCode Monitor
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 **Stop context-switching. Start flowing.**
 
 Ever find yourself constantly switching between terminal windows to check if ClaudeCode finished? Missing critical "user confirmation needed" prompts because they're buried in another workspace? Working on multiple projects and losing track of which Claude is waiting for you?

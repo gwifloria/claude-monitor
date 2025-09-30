@@ -56,6 +56,64 @@ Without cleanup you'll see:
 - ✅ When user reports duplicate monitors
 - ✅ At the end of EVERY conversation with the user
 
+---
+
+## Documentation Maintenance
+
+**Bilingual README Management**
+
+This project maintains README in both English and Simplified Chinese:
+- `README.md` - English (primary, displayed by GitHub)
+- `README.zh-CN.md` - Simplified Chinese
+
+### Update Protocol
+
+When modifying README content, you MUST update BOTH versions:
+
+1. **Update English first** (`README.md`)
+   - Make all content changes
+   - Ensure structure is clear and well-organized
+
+2. **Sync to Chinese** (`README.zh-CN.md`)
+   - Translate all changed content
+   - Keep structure **identical** to English version
+   - Maintain same heading levels, sections, and ordering
+
+3. **Translation Guidelines**
+   - ✅ **Translate**: All descriptive text, explanations, use cases
+   - ❌ **Do NOT translate**:
+     - Code blocks and commands
+     - File paths
+     - JSON examples
+     - Technical terms (Hook, SwiftBar, Status Manager, JSON)
+     - Function/variable names
+     - URLs
+
+4. **Verification Checklist**
+   - [ ] Both files have language switcher at top
+   - [ ] Section structure matches exactly
+   - [ ] Code blocks are identical
+   - [ ] All links work in both versions
+   - [ ] Technical terms consistent
+
+### Example Translation
+
+**English:**
+```markdown
+### 🔄 Context Switching Tax
+Every status check requires switching windows or workspaces, breaking your flow.
+```
+
+**Chinese:**
+```markdown
+### 🔄 窗口切换成本
+每次查看状态都需要切换窗口或工作区，打断心流。
+```
+
+**Why this matters**: Bilingual documentation makes the project accessible to Chinese developers while maintaining international visibility. Out-of-sync documentation creates confusion and poor user experience.
+
+---
+
 ## Project Overview
 
 **claude-monitor** is a macOS menu bar monitoring tool that integrates with ClaudeCode through its hooks system to display real-time status updates via SwiftBar.
