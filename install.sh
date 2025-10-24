@@ -330,6 +330,13 @@ install_swiftbar_plugin() {
     # Create SwiftBar plugins directory
     mkdir -p "$SWIFTBAR_PLUGINS_DIR"
 
+    # Clean up any duplicate plugins in Plugins subdirectory to prevent conflicts
+    if [[ -d "$SWIFTBAR_PLUGINS_DIR/Plugins" ]]; then
+        log_info "Cleaning duplicate plugins from Plugins subdirectory..."
+        rm -rf "$SWIFTBAR_PLUGINS_DIR/Plugins/claude"* 2>/dev/null || true
+        rm -rf "$SWIFTBAR_PLUGINS_DIR/Plugins/cc_"* 2>/dev/null || true
+    fi
+
     # Copy plugin file (1s refresh rate for smooth animation)
     cp "$SCRIPT_DIR/plugins/claude_monitor.1s.sh" "$SWIFTBAR_PLUGINS_DIR/"
     chmod +x "$SWIFTBAR_PLUGINS_DIR/claude_monitor.1s.sh"

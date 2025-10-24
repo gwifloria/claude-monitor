@@ -66,7 +66,7 @@ get_status_display() {
             ;;
         "processing")
             animation=$(get_loading_animation)
-            echo "$animation $count | color=#333333 font=Menlo"
+            echo "$animation $count | font=Menlo"
             ;;
         "completed")
             echo "✅ $count | color=green"
@@ -100,6 +100,9 @@ update_refresh_rate() {
         echo "15s" > "$REFRESH_CONFIG"
     fi
 }
+
+# Clean dead sessions before getting status
+"$STATUS_MANAGER" clean-dead 2>/dev/null || true
 
 # Get summary status
 summary_output=$("$STATUS_MANAGER" summary)
@@ -167,7 +170,7 @@ if [[ "$attention_count" -gt 0 ]]; then
 fi
 if [[ "$processing_count" -gt 0 ]]; then
     animation=$(get_loading_animation)
-    echo "$animation $processing_count processing | color=#333333 font=Menlo"
+    echo "$animation $processing_count processing | font=Menlo"
 fi
 if [[ "$completed_count" -gt 0 ]]; then
     echo "✅ $completed_count completed | color=green"
@@ -192,7 +195,7 @@ while IFS='|' read -r project_name status priority project_path; do
             ;;
         "processing")
             animation=$(get_loading_animation)
-            echo "  $animation $project_name | color=#333333 font=Menlo bash='cd \"$project_path\" && claude' terminal=true"
+            echo "  $animation $project_name | font=Menlo bash='cd \"$project_path\" && claude' terminal=true"
             ;;
         "completed")
             echo "  ✅ $project_name | color=green bash='cd \"$project_path\" && claude' terminal=true"

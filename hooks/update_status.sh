@@ -37,7 +37,8 @@ esac
 # Special handling for session management
 case "$STATUS" in
     "connected")
-        # Session start: register new session
+        # Session start: clean dead sessions first, then register new session
+        "$STATUS_MANAGER" clean-dead 2>/dev/null || true
         "$STATUS_MANAGER" update "connected"
         ;;
     "disconnected")

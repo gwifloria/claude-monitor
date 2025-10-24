@@ -160,7 +160,7 @@ The project configures these ClaudeCode lifecycle hooks:
 | `UserPromptSubmit` | `processing` | 3 | User submitted a prompt, Claude is working |
 | `Notification` | `attention` | 4 | User action required (highest priority) |
 | `Stop` | `completed` | 2 | Claude finished the entire response |
-| `SessionStart` | `connected` | 1 | New session established |
+| `SessionStart` | `connected` | 1 | New session established, cleans dead sessions first |
 | `SessionEnd` | (remove) | - | Clean up session data |
 
 **Note**: `SubagentStop` hook is intentionally not configured. Sub-agent completion doesn't indicate the main task is done, as Claude may launch multiple sub-agents or continue processing after a sub-agent finishes.
@@ -241,6 +241,7 @@ export CLAUDE_MONITOR_DEBUG=1
 ~/.claude-monitor/lib/status_manager.sh summary
 ~/.claude-monitor/lib/status_manager.sh list
 ~/.claude-monitor/lib/status_manager.sh clean
+~/.claude-monitor/lib/status_manager.sh clean-dead
 
 # View debug logs
 tail -f ~/.claude-monitor/debug.log
@@ -274,6 +275,30 @@ session_id=$(echo -n "$project_path" | md5 | cut -c1-8)
 
 **Why**: Ensures same project always has same session ID across hook invocations, preventing duplicate sessions.
 
+### Auto-Cleanup of Dead Sessions
+
+The monitor automatically detects and removes sessions for terminated ClaudeCode processes through multiple mechanisms:
+
+1. **SessionStart Hook Cleanup** (immediate)
+   - Runs when a new ClaudeCode session starts
+   - Cleans dead sessions before registering the new session
+   - Ensures fresh state at session initialization
+
+2. **SwiftBar Auto-Cleanup** (periodic)
+   - Runs on every SwiftBar refresh (1s interval)
+   - Uses `ps` + `lsof` to verify active claude CLI processes
+   - Removes sessions without corresponding processes after 5min threshold
+   - Handles cases where `SessionEnd` hook didn't fire (crashes, force-quit, etc.)
+
+3. **Status Expiration** (time-based)
+   - **completed**: Auto-expires to idle after 60 seconds
+   - **attention**: Auto-expires to idle after 10 minutes
+   - **processing**: Auto-expires to idle after 30 minutes without updates
+     - Handles time limit scenarios where session stops responding but process remains alive
+     - Prevents perpetual "processing" display when ClaudeCode reaches conversation limits
+
+This multi-layer cleanup ensures displayed status always reflects actual running ClaudeCode instances.
+
 ### State Persistence
 
 Status stored in JSON file (`~/.claude-monitor/sessions.json`):
@@ -302,9 +327,9 @@ Installation intelligently merges with existing `~/.claude/settings.json`:
 
 ## Known Issues & Solutions
 
-### Issue: Duplicate Sessions for Same Project
-**Cause**: Early versions used PID-based session IDs
-**Solution**: Now uses MD5 hash of project path for stability
+### Issue: Stale Sessions After Abnormal Exit
+**Cause**: `SessionEnd` hook doesn't fire when ClaudeCode crashes or is force-killed
+**Solution**: Auto-cleanup runs every second, removes dead sessions within 5 minutes
 
 ### Issue: False 💤 Icon When No Sessions Exist
 **Cause**: Plugin showed "idle" even before first ClaudeCode session
@@ -313,6 +338,10 @@ Installation intelligently merges with existing `~/.claude/settings.json`:
 ### Issue: Status Not Updating in Real-Time
 **Cause**: Hook script permissions or missing dependencies
 **Solution**: Installation script ensures executable permissions and validates dependencies
+
+### Issue: Processing Status Persists After Time Limit ✅ FIXED
+**Cause**: When ClaudeCode reaches time limit, process may remain alive but stop triggering hooks
+**Solution**: Processing status auto-expires to idle after 30 minutes without `last_updated` changes (lib/status_manager.sh:129)
 
 See [docs/bug-analysis.md](docs/bug-analysis.md) for detailed post-mortem analysis.
 
@@ -346,8 +375,9 @@ cat ~/.claude/settings.json | jq .hooks
 3. Check for errors: `export CLAUDE_MONITOR_DEBUG=1` and watch `~/.claude-monitor/debug.log`
 
 **Multiple duplicate sessions showing**
-1. Clean stale sessions: `~/.claude-monitor/lib/status_manager.sh clean`
-2. If persists, remove sessions file: `rm ~/.claude-monitor/sessions.json` (will auto-recreate)
+1. Auto-cleanup removes dead sessions within 5 minutes
+2. Manual cleanup: `~/.claude-monitor/lib/status_manager.sh clean-dead`
+3. Full reset: `rm ~/.claude-monitor/sessions.json && echo '{}' > ~/.claude-monitor/sessions.json`
 
 ## Configuration Safety
 

@@ -44,8 +44,19 @@ get_project_info() {
     local pwd_path
     local project_name
     local session_id
+    local git_root
 
-    pwd_path=$(pwd)
+    # Try to get git root directory first (handles monorepo case)
+    git_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
+
+    if [[ -n "$git_root" ]]; then
+        # Use git root for session ID (all subdirs share same session)
+        pwd_path="$git_root"
+    else
+        # Fallback to current directory if not in git repo
+        pwd_path=$(pwd)
+    fi
+
     project_name=$(basename "$pwd_path")
     # Use MD5 hash of full path for consistent session ID
     session_id=$(echo -n "$pwd_path" | md5 | cut -c1-8)
@@ -111,7 +122,10 @@ remove_session() {
     release_lock
 }
 
-# Clean expired completed statuses (older than 60 seconds)
+# Clean stale statuses (auto-expire to idle)
+# - completed: after 60 seconds
+# - attention: after 10 minutes (600 seconds)
+# - processing: after 30 minutes without updates (handles time limit scenarios)
 clean_expired_completed() {
     local current_time
     current_time=$(date +%s)
@@ -121,11 +135,56 @@ clean_expired_completed() {
     jq \
         --arg current_time "$current_time" \
         'to_entries | map(
-            if .value.status == "completed" and (($current_time | tonumber) - .value.timestamp) > 60 then
+            if (.value.status == "completed" and (($current_time | tonumber) - .value.timestamp) > 60) or
+               (.value.status == "attention" and (($current_time | tonumber) - .value.timestamp) > 600) or
+               (.value.status == "processing" and (($current_time | tonumber) - (.value.last_updated // .value.timestamp)) > 1800) then
                 .value.status = "idle" | .value.priority = 1
             else
                 .
             end
+        ) | from_entries' \
+        "$STATUS_FILE" > "$STATUS_FILE.tmp" && mv "$STATUS_FILE.tmp" "$STATUS_FILE"
+
+    release_lock
+}
+
+# Clean sessions for dead ClaudeCode processes
+# Removes sessions where the corresponding claude process no longer exists
+clean_dead_sessions() {
+    local current_time
+    current_time=$(date +%s)
+    local stale_threshold=300  # 5 minutes in seconds
+
+    # Get all active claude CLI process working directories
+    local active_dirs=()
+    while IFS= read -r pid; do
+        [[ -z "$pid" ]] && continue
+        # Get working directory for this claude process
+        local cwd
+        cwd=$(lsof -p "$pid" -a -d cwd -Fn 2>/dev/null | grep '^n' | sed 's/^n//')
+        if [[ -n "$cwd" ]]; then
+            active_dirs+=("$cwd")
+        fi
+    done < <(ps aux | grep -E '^\S+\s+\S+.*\sclaude\s*$' | awk '{print $2}')
+
+    acquire_lock || return 1
+
+    # Build a jq filter to check if project_path is in active_dirs
+    local active_dirs_json
+    active_dirs_json=$(printf '%s\n' "${active_dirs[@]}" | jq -R . | jq -s .)
+
+    jq \
+        --argjson active_dirs "$active_dirs_json" \
+        --arg current_time "$current_time" \
+        --arg threshold "$stale_threshold" \
+        'to_entries | map(
+            select(
+                # Keep session if:
+                # 1. Project path is in active directories, OR
+                # 2. Session was updated recently (within threshold)
+                ([.value.project_path] | inside($active_dirs)) or
+                (($current_time | tonumber) - (.value.last_updated // .value.timestamp)) < ($threshold | tonumber)
+            )
         ) | from_entries' \
         "$STATUS_FILE" > "$STATUS_FILE.tmp" && mv "$STATUS_FILE.tmp" "$STATUS_FILE"
 
@@ -208,16 +267,20 @@ case "${1:-}" in
     "clean")
         clean_expired_completed
         ;;
+    "clean-dead")
+        clean_dead_sessions
+        ;;
     "has-sessions")
         has_sessions
         ;;
     *)
-        echo "Usage: $0 {update|remove|list|summary|clean|has-sessions} [args...]" >&2
+        echo "Usage: $0 {update|remove|list|summary|clean|clean-dead|has-sessions} [args...]" >&2
         echo "  update <status>      - Update current project status" >&2
         echo "  remove               - Remove current project session" >&2
         echo "  list                 - List all active sessions" >&2
         echo "  summary              - Get summary for menu bar display" >&2
         echo "  clean                - Clean expired completed statuses" >&2
+        echo "  clean-dead           - Clean sessions for dead processes" >&2
         echo "  has-sessions         - Check if any sessions exist" >&2
         exit 1
         ;;
