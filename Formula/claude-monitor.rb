@@ -1,13 +1,12 @@
 class ClaudeMonitor < Formula
   desc "Real-time ClaudeCode status in your macOS menu bar"
   homepage "https://github.com/gwifloria/claude-monitor"
-  url "https://github.com/gwifloria/claude-monitor/archive/refs/tags/v0.2.0.tar.gz"
+  url "https://github.com/gwifloria/claude-monitor/archive/refs/tags/v0.2.1.tar.gz"
   sha256 "" # Will be filled after creating the release
   license "MIT"
-  version "0.2.0"
+  version "0.2.1"
 
   depends_on "jq"
-  depends_on "swiftbar"
 
   def install
     # Install core library files
@@ -157,10 +156,11 @@ class ClaudeMonitor < Formula
 
   def caveats
     <<~EOS
-      To complete installation, run:
-        claude-monitor-setup
+      ⚠️  SwiftBar is required but must be installed separately:
+        brew install --cask swiftbar
 
-      Then start monitoring with:
+      After installing SwiftBar, complete the setup:
+        claude-monitor-setup
         claude-monitor start
 
       The monitor will appear in your macOS menu bar.

@@ -36,17 +36,20 @@ Stop switching windows to check if Claude finished. Never miss a confirmation pr
 **Prerequisites:** macOS, [ClaudeCode](https://claude.ai/code), [Homebrew](https://brew.sh)
 
 ```bash
-# Install via Homebrew
+# 1. Install SwiftBar (menu bar application)
+brew install --cask swiftbar
+
+# 2. Install ClaudeCode Monitor
 brew install gwifloria/tap/claude-monitor
 
-# Run setup (configures hooks and SwiftBar)
+# 3. Run setup (configures hooks and plugins)
 claude-monitor-setup
 
-# Start monitoring
+# 4. Start monitoring
 claude-monitor start
 ```
 
-The installer will auto-configure dependencies (SwiftBar, jq) and ClaudeCode hooks.
+The installer will auto-configure ClaudeCode hooks and install the monitoring plugin.
 
 ## Usage
 

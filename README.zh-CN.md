@@ -36,17 +36,20 @@
 **前置要求：** macOS、[ClaudeCode](https://claude.ai/code)、[Homebrew](https://brew.sh)
 
 ```bash
-# 通过 Homebrew 安装
+# 1. 安装 SwiftBar（菜单栏应用程序）
+brew install --cask swiftbar
+
+# 2. 安装 ClaudeCode Monitor
 brew install gwifloria/tap/claude-monitor
 
-# 运行配置（配置 hooks 和 SwiftBar）
+# 3. 运行配置（配置 hooks 和插件）
 claude-monitor-setup
 
-# 启动监控
+# 4. 启动监控
 claude-monitor start
 ```
 
-安装程序会自动配置依赖项（SwiftBar、jq）和 ClaudeCode hooks。
+安装程序会自动配置 ClaudeCode hooks 并安装监控插件。
 
 ## 使用方法
 

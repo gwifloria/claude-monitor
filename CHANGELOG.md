@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2024-10-26
+
+### Fixed
+
+- **Homebrew installation failure** - Removed `swiftbar` from formula dependencies
+  - SwiftBar is a Cask (GUI app) and cannot be a dependency of a Formula (CLI tool)
+  - Users now install SwiftBar separately: `brew install --cask swiftbar`
+  - Added clear installation instructions in formula `caveats`
+
+### Changed
+
+- Updated installation steps in README to be a 4-step process
+- Clarified that SwiftBar must be installed separately
+- Improved setup documentation
+
 ## [0.2.0] - 2024-10-26
 
 ### ⚠️ Breaking Changes
@@ -114,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SwiftBar menu bar integration
   - Comprehensive documentation
 
-[Unreleased]: https://github.com/gwifloria/claude-monitor/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/gwifloria/claude-monitor/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/gwifloria/claude-monitor/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/gwifloria/claude-monitor/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/gwifloria/claude-monitor/releases/tag/v0.1.0
