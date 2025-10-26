@@ -23,13 +23,13 @@ Stop switching windows to check if Claude finished. Never miss a confirmation pr
 
 ## Status Types
 
-| Icon | Status | Description |
-|------|--------|-------------|
-| ⚠️ | **Attention** | User confirmation required (highest priority) |
+| Icon   | Status         | Description                                     |
+| ------ | -------------- | ----------------------------------------------- |
+| ⚠️     | **Attention**  | User confirmation required (highest priority)   |
 | ⠇⠦⠴⠸⠙⠋ | **Processing** | Claude is working (6-frame clockwise animation) |
-| ✅ | **Completed** | Task finished, ready for review |
-| 💤 | **Idle** | Waiting for your next prompt |
-| 💤0 | **Inactive** | No ClaudeCode sessions detected |
+| ✅     | **Completed**  | Task finished, ready for review                 |
+| 💤     | **Idle**       | Waiting for your next prompt                    |
+| 💤0    | **Inactive**   | No ClaudeCode sessions detected                 |
 
 ## Installation
 
@@ -37,7 +37,7 @@ Stop switching windows to check if Claude finished. Never miss a confirmation pr
 
 ```bash
 # Install via Homebrew
-brew install yourname/tap/claude-monitor
+brew install gwifloria/tap/claude-monitor
 
 # Run setup (configures hooks and SwiftBar)
 claude-monitor-setup
@@ -59,6 +59,7 @@ The installer will auto-configure dependencies (SwiftBar, jq) and ClaudeCode hoo
 ### Viewing Status
 
 Click the menu bar icon to see:
+
 - Overall status summary with counts
 - Individual project statuses
 - Quick navigation to project directories
@@ -98,31 +99,34 @@ ClaudeCode Monitor integrates seamlessly with ClaudeCode's built-in hooks system
 ### Event Flow
 
 **When you submit a prompt:**
+
 1. `UserPromptSubmit` hook fires → Updates status to **⠇ Processing**
 2. SwiftBar reads status every 1 second → Shows animated spinner
 3. Claude finishes → `Stop` hook fires → Status becomes **✅ Completed**
 4. You start new task → Status returns to **💤 Idle**
 
 **When Claude needs confirmation:**
+
 1. `Notification` hook fires → Status jumps to **⚠️ Attention** (highest priority)
 2. Menu bar shows warning icon → Impossible to miss
 3. You respond → Hook updates status → Animation continues
 
 ### Configured Hooks
 
-| Hook Event | Trigger | Status Update | Priority |
-|------------|---------|---------------|----------|
-| `UserPromptSubmit` | You send a prompt | ⠋ **Processing** | P2 |
-| `Notification` | Claude needs confirmation | ⚠️ **Attention** | P1 (highest) |
-| `Stop` | Claude finishes entire response | ✅ **Completed** | P3 |
-| `SessionStart` | New ClaudeCode session | 💤 **Idle** | P4 |
-| `SessionEnd` | ClaudeCode exits | *(Remove session)* | — |
+| Hook Event         | Trigger                         | Status Update      | Priority     |
+| ------------------ | ------------------------------- | ------------------ | ------------ |
+| `UserPromptSubmit` | You send a prompt               | ⠋ **Processing**   | P2           |
+| `Notification`     | Claude needs confirmation       | ⚠️ **Attention**   | P1 (highest) |
+| `Stop`             | Claude finishes entire response | ✅ **Completed**   | P3           |
+| `SessionStart`     | New ClaudeCode session          | 💤 **Idle**        | P4           |
+| `SessionEnd`       | ClaudeCode exits                | _(Remove session)_ | —            |
 
 > **Note**: `SubagentStop` is intentionally **not** configured. Sub-agent completion doesn't mean the main task is done—Claude may launch multiple sub-agents or continue processing afterward.
 
 ### Data Storage
 
 Status is stored in JSON at `~/.claude-monitor/sessions.json`:
+
 ```json
 {
   "a3a5596b": {
@@ -149,6 +153,7 @@ tail -f ~/.claude-monitor/debug.log
 ### Common Issues
 
 **Menu bar icon not appearing:**
+
 ```bash
 # Check if SwiftBar is running
 pgrep -f SwiftBar
@@ -158,6 +163,7 @@ pgrep -f SwiftBar
 ```
 
 **Status not updating:**
+
 ```bash
 # Test hook manually
 ~/.claude/hooks/update_status.sh processing
@@ -170,6 +176,7 @@ cat ~/.claude-monitor/sessions.json | jq .
 ```
 
 **Multiple duplicate sessions:**
+
 ```bash
 # Auto-cleanup runs every second (dead sessions removed within 5 min)
 # Manual cleanup if needed:
@@ -194,6 +201,7 @@ To completely remove ClaudeCode Monitor:
 ```
 
 This will:
+
 - Remove all installed files
 - Restore original ClaudeCode configuration from backup
 - Clean up SwiftBar plugin

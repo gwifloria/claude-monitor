@@ -26,7 +26,7 @@ echo "0.2.0" > VERSION
 
 # 更新 Formula/claude-monitor.rb
 # - version "0.2.0"
-# - url "https://github.com/yourname/claude-monitor/archive/refs/tags/v0.2.0.tar.gz"
+# - url "https://github.com/gwifloria/claude-monitor/archive/refs/tags/v0.2.0.tar.gz"
 ```
 
 ### 3. 创建 Git Tag 和 GitHub Release
@@ -56,7 +56,7 @@ git push origin v0.2.0
 
 ```bash
 # GitHub 会自动生成源码压缩包，下载并计算 SHA256
-curl -L "https://github.com/yourname/claude-monitor/archive/refs/tags/v0.2.0.tar.gz" -o claude-monitor-0.2.0.tar.gz
+curl -L "https://github.com/gwifloria/claude-monitor/archive/refs/tags/v0.2.0.tar.gz" -o claude-monitor-0.2.0.tar.gz
 
 # 计算 SHA256
 shasum -a 256 claude-monitor-0.2.0.tar.gz
@@ -118,7 +118,7 @@ git push origin main && git push origin v0.3.0
 # 3. 创建 GitHub Release
 
 # 4. 更新 SHA256 并推送到 Tap
-curl -L "https://github.com/yourname/claude-monitor/archive/refs/tags/v0.3.0.tar.gz" | shasum -a 256
+curl -L "https://github.com/gwifloria/claude-monitor/archive/refs/tags/v0.3.0.tar.gz" | shasum -a 256
 # 编辑 Formula 更新 sha256
 cd ../homebrew-tap
 cp ../claude-monitor/Formula/claude-monitor.rb .
@@ -132,21 +132,27 @@ git push
 ## [0.2.0] - YYYY-MM-DD
 
 ### Added
+
 - 新功能描述
 
 ### Changed
+
 - 变更描述
 
 ### Deprecated
+
 - 废弃功能描述
 
 ### Removed
+
 - 移除功能描述
 
 ### Fixed
+
 - 修复问题描述
 
 ### Security
+
 - 安全更新描述
 ```
 
@@ -183,10 +189,11 @@ brew uninstall claude-monitor
 **原因**: Formula 中的 SHA256 与实际压缩包不符
 
 **解决方案**:
+
 ```bash
 # 重新下载并计算
 rm claude-monitor-*.tar.gz
-curl -L "https://github.com/yourname/claude-monitor/archive/refs/tags/v0.2.0.tar.gz" -o claude-monitor-0.2.0.tar.gz
+curl -L "https://github.com/gwifloria/claude-monitor/archive/refs/tags/v0.2.0.tar.gz" -o claude-monitor-0.2.0.tar.gz
 shasum -a 256 claude-monitor-0.2.0.tar.gz
 
 # 更新 Formula 中的 sha256 字段
@@ -195,16 +202,18 @@ shasum -a 256 claude-monitor-0.2.0.tar.gz
 ### 用户报告安装失败
 
 让用户尝试：
+
 ```bash
 brew doctor          # 检查 Homebrew 健康状况
 brew update          # 更新 Homebrew
 brew upgrade         # 升级所有包
-brew reinstall yourname/tap/claude-monitor
+brew reinstall gwifloria/tap/claude-monitor
 ```
 
 ### Formula 安装后命令不可用
 
 检查：
+
 ```bash
 # 1. 检查 bin 目录是否正确创建
 ls -la $(brew --prefix)/bin/claude-monitor*
@@ -219,6 +228,7 @@ echo $PATH | grep $(brew --prefix)/bin
 ### SwiftBar 插件未安装
 
 手动检查：
+
 ```bash
 # 检查插件是否存在
 ls -la "$HOME/Library/Application Support/SwiftBar/claude_monitor.1s.sh"
@@ -233,12 +243,14 @@ claude-monitor restart
 ## 🎯 发布到 Homebrew Core（可选）
 
 **要求**:
+
 - 项目稳定运行至少 30 天
 - GitHub stars 达到一定数量（通常 30+）
 - 有活跃的维护和用户群
 - 符合 Homebrew 质量标准
 
 **流程**:
+
 1. Fork https://github.com/Homebrew/homebrew-core
 2. 将 Formula 添加到 `Formula/` 目录
 3. 提交 Pull Request

@@ -37,7 +37,7 @@
 
 ```bash
 # 通过 Homebrew 安装
-brew install yourname/tap/claude-monitor
+brew install gwifloria/tap/claude-monitor
 
 # 运行配置（配置 hooks 和 SwiftBar）
 claude-monitor-setup

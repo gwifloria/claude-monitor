@@ -20,7 +20,7 @@ Stop switching windows to check if Claude finished. Never miss a confirmation pr
 **Via Homebrew (recommended):**
 
 ```bash
-brew install yourname/tap/claude-monitor
+brew install gwifloria/tap/claude-monitor
 claude-monitor-setup
 claude-monitor start
 ```
@@ -28,7 +28,7 @@ claude-monitor start
 **Manual installation:**
 
 ```bash
-curl -fsSL https://github.com/yourname/claude-monitor/archive/refs/tags/v{VERSION}.tar.gz | tar xz
+curl -fsSL https://github.com/gwifloria/claude-monitor/archive/refs/tags/v{VERSION}.tar.gz | tar xz
 cd claude-monitor-{VERSION}
 ./install.sh
 ```
@@ -36,7 +36,7 @@ cd claude-monitor-{VERSION}
 Or clone the repository:
 
 ```bash
-git clone https://github.com/yourname/claude-monitor.git
+git clone https://github.com/gwifloria/claude-monitor.git
 cd claude-monitor
 ./install.sh
 ```
@@ -60,19 +60,20 @@ The monitor icon will appear in your menu bar!
 
 ### 📊 Status Types
 
-| Icon | Status | Description |
-|------|--------|-------------|
-| ⚠️ | **Attention** | User confirmation required (highest priority) |
+| Icon   | Status         | Description                                     |
+| ------ | -------------- | ----------------------------------------------- |
+| ⚠️     | **Attention**  | User confirmation required (highest priority)   |
 | ⠇⠦⠴⠸⠙⠋ | **Processing** | Claude is working (6-frame clockwise animation) |
-| ✅ | **Completed** | Task finished, ready for review |
-| 💤 | **Idle** | Waiting for your next prompt |
-| 💤0 | **Inactive** | No ClaudeCode sessions detected |
+| ✅     | **Completed**  | Task finished, ready for review                 |
+| 💤     | **Idle**       | Waiting for your next prompt                    |
+| 💤0    | **Inactive**   | No ClaudeCode sessions detected                 |
 
 ### 🔧 How It Works
 
 ClaudeCode Monitor integrates seamlessly with ClaudeCode's built-in hooks system to provide real-time status updates in your macOS menu bar via SwiftBar.
 
 **Event Flow:**
+
 1. You submit a prompt to ClaudeCode
 2. `UserPromptSubmit` hook fires → Status: **⠋ Processing**
 3. SwiftBar reads status every 1s → Displays animated spinner
@@ -80,17 +81,18 @@ ClaudeCode Monitor integrates seamlessly with ClaudeCode's built-in hooks system
 5. You respond → Claude continues
 6. Claude finishes → `Stop` hook → Status: **✅ Completed**
 
-See [README.md](https://github.com/yourname/claude-monitor#how-it-works) for detailed architecture.
+See [README.md](https://github.com/gwifloria/claude-monitor#how-it-works) for detailed architecture.
 
 ### 📚 Documentation
 
-- **English**: [README.md](https://github.com/yourname/claude-monitor/blob/main/README.md)
-- **简体中文**: [README.zh-CN.md](https://github.com/yourname/claude-monitor/blob/main/README.zh-CN.md)
-- **Development Guide**: [docs/development-guide.md](https://github.com/yourname/claude-monitor/blob/main/docs/development-guide.md)
+- **English**: [README.md](https://github.com/gwifloria/claude-monitor/blob/main/README.md)
+- **简体中文**: [README.zh-CN.md](https://github.com/gwifloria/claude-monitor/blob/main/README.zh-CN.md)
+- **Development Guide**: [docs/development-guide.md](https://github.com/gwifloria/claude-monitor/blob/main/docs/development-guide.md)
 
 ### 🐛 Troubleshooting
 
 **Menu bar icon not appearing:**
+
 ```bash
 # Check if SwiftBar is running
 pgrep -f SwiftBar
@@ -100,6 +102,7 @@ claude-monitor restart
 ```
 
 **Status not updating:**
+
 ```bash
 # Test hook manually
 ~/.claude/hooks/update_status.sh processing
@@ -109,17 +112,19 @@ export CLAUDE_MONITOR_DEBUG=1
 tail -f ~/.claude-monitor/debug.log
 ```
 
-See [README.md#troubleshooting](https://github.com/yourname/claude-monitor#troubleshooting) for more solutions.
+See [README.md#troubleshooting](https://github.com/gwifloria/claude-monitor#troubleshooting) for more solutions.
 
 ### 🗑️ Uninstall
 
 **Via Homebrew:**
+
 ```bash
 brew uninstall claude-monitor
 rm -rf ~/.claude-monitor
 ```
 
 **Manual installation:**
+
 ```bash
 ./uninstall.sh
 ```
@@ -138,8 +143,8 @@ rm -rf ~/.claude-monitor
 
 ### 📄 License
 
-MIT License - See [LICENSE](https://github.com/yourname/claude-monitor/blob/main/LICENSE) file for details
+MIT License - See [LICENSE](https://github.com/gwifloria/claude-monitor/blob/main/LICENSE) file for details
 
 ---
 
-**Full Changelog**: https://github.com/yourname/claude-monitor/commits/v{VERSION}
+**Full Changelog**: https://github.com/gwifloria/claude-monitor/commits/v{VERSION}

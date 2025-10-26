@@ -10,32 +10,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2024-10-26
 
 ### ⚠️ Breaking Changes
+
 - **Removed manual installation support** - Now exclusively uses Homebrew for installation
   - Removed `install.sh` and `uninstall.sh` scripts
   - Simplified installation to single Homebrew command
 
 ### Added
+
 - Homebrew formula for easy installation
 - Comprehensive Homebrew maintenance documentation (`docs/homebrew-maintenance.md`)
 - Version update workflow demonstration
 
 ### Changed
+
 - Simplified README installation instructions (Homebrew only)
 - Reorganized repository structure for better clarity
 
 ### Removed
+
 - Manual installation scripts (`install.sh`, `uninstall.sh`)
 - Formula testing script (`test-formula.sh`)
 - Temporary development files (`todos.md`)
 - Redundant Homebrew setup documentation
 
 ### Documentation
+
 - Consolidated Homebrew release guides into single maintenance document
 - Updated both English and Chinese README files
 
 ## [0.1.0] - 2024-10-26
 
 ### Added
+
 - 🎉 Initial release of ClaudeCode Monitor
 - 🔄 Real-time status tracking for multiple ClaudeCode projects
 - ⚠️ Smart alerts for confirmation prompts with flashing menu bar icon
@@ -48,7 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📝 Comprehensive documentation in English and Simplified Chinese
 
 ### Features
+
 - **Hook Integration**: Seamlessly integrates with ClaudeCode's built-in hooks system
+
   - `UserPromptSubmit` → Processing status
   - `Notification` → Attention status (highest priority)
   - `Stop` → Completed status
@@ -56,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `SessionEnd` → Session removal
 
 - **Status Management**:
+
   - JSON-based multi-session state store
   - File locking for concurrent safety
   - Auto-expiration of completed statuses (60s)
@@ -63,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Processing timeout handling (30 min auto-expire)
 
 - **User Experience**:
+
   - One-line installation via shell script
   - Interactive setup wizard
   - Conflict detection with merge strategies
@@ -76,10 +86,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SwiftBar process management script
 
 ### Installation Methods
+
 - Manual installation via `install.sh`
 - Homebrew formula (coming soon)
 
 ### Documentation
+
 - English README with comprehensive guide
 - Simplified Chinese README (README.zh-CN.md)
 - Development guide for contributors
@@ -87,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLAUDE.md with detailed architecture and design decisions
 
 ### Known Limitations
+
 - macOS only (requires SwiftBar)
 - Requires ClaudeCode CLI to be installed
 - Requires Homebrew for dependency management
@@ -101,6 +114,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SwiftBar menu bar integration
   - Comprehensive documentation
 
-[Unreleased]: https://github.com/yourname/claude-monitor/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/yourname/claude-monitor/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/yourname/claude-monitor/releases/tag/v0.1.0
+[Unreleased]: https://github.com/gwifloria/claude-monitor/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/gwifloria/claude-monitor/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/gwifloria/claude-monitor/releases/tag/v0.1.0
