@@ -7,12 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-10-26
+
+### ⚠️ Breaking Changes
+- **Removed manual installation support** - Now exclusively uses Homebrew for installation
+  - Removed `install.sh` and `uninstall.sh` scripts
+  - Simplified installation to single Homebrew command
+
 ### Added
 - Homebrew formula for easy installation
-- Automated testing script for formula validation
-- Comprehensive release documentation
+- Comprehensive Homebrew maintenance documentation (`docs/homebrew-maintenance.md`)
+- Version update workflow demonstration
 
-## [0.1.0] - TBD
+### Changed
+- Simplified README installation instructions (Homebrew only)
+- Reorganized repository structure for better clarity
+
+### Removed
+- Manual installation scripts (`install.sh`, `uninstall.sh`)
+- Formula testing script (`test-formula.sh`)
+- Temporary development files (`todos.md`)
+- Redundant Homebrew setup documentation
+
+### Documentation
+- Consolidated Homebrew release guides into single maintenance document
+- Updated both English and Chinese README files
+
+## [0.1.0] - 2024-10-26
 
 ### Added
 - 🎉 Initial release of ClaudeCode Monitor
@@ -80,5 +101,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SwiftBar menu bar integration
   - Comprehensive documentation
 
-[Unreleased]: https://github.com/yourname/claude-monitor/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/yourname/claude-monitor/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/yourname/claude-monitor/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yourname/claude-monitor/releases/tag/v0.1.0

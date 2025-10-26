@@ -35,10 +35,8 @@
 
 **前置要求：** macOS、[ClaudeCode](https://claude.ai/code)、[Homebrew](https://brew.sh)
 
-### 方式一：Homebrew（推荐）
-
 ```bash
-# 添加 tap 并安装
+# 通过 Homebrew 安装
 brew install yourname/tap/claude-monitor
 
 # 运行配置（配置 hooks 和 SwiftBar）
@@ -48,15 +46,7 @@ claude-monitor-setup
 claude-monitor start
 ```
 
-### 方式二：手动安装
-
-```bash
-git clone https://github.com/yourname/claude-monitor.git
-cd claude-monitor
-./install.sh
-```
-
-两种方式都会自动配置依赖项（SwiftBar、jq）和 ClaudeCode hooks。
+安装程序会自动配置依赖项（SwiftBar、jq）和 ClaudeCode hooks。
 
 ## 使用方法
 
