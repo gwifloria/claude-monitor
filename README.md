@@ -35,13 +35,28 @@ Stop switching windows to check if Claude finished. Never miss a confirmation pr
 
 **Prerequisites:** macOS, [ClaudeCode](https://claude.ai/code), [Homebrew](https://brew.sh)
 
+### Option 1: Homebrew (Recommended)
+
 ```bash
-git clone <repository-url>
+# Add tap and install
+brew install yourname/tap/claude-monitor
+
+# Run setup (configures hooks and SwiftBar)
+claude-monitor-setup
+
+# Start monitoring
+claude-monitor start
+```
+
+### Option 2: Manual Installation
+
+```bash
+git clone https://github.com/yourname/claude-monitor.git
 cd claude-monitor
 ./install.sh
 ```
 
-Installer auto-configures dependencies (SwiftBar, jq) and ClaudeCode hooks.
+Both methods auto-configure dependencies (SwiftBar, jq) and ClaudeCode hooks.
 
 ## Usage
 
