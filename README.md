@@ -216,7 +216,27 @@ Contributions are welcome! Please read [docs/development-guide.md](docs/developm
 
 ### For Maintainers
 
-**Automated Homebrew Releases**: This project uses GitHub Actions to automatically update the Homebrew formula when a new release is published. See [docs/homebrew-maintenance.md](docs/homebrew-maintenance.md) for the complete release workflow and [docs/github-actions-setup.md](docs/github-actions-setup.md) for automation setup.
+**Automated Release System**: This project includes a one-command release script that automates version bumping, changelog updates, and Git operations:
+
+```bash
+./release.sh patch  # Bug fixes (0.2.2 → 0.2.3)
+./release.sh minor  # New features (0.2.2 → 0.3.0)
+./release.sh major  # Breaking changes (0.2.2 → 1.0.0)
+```
+
+The release script automatically:
+- Updates VERSION and Formula files
+- Inserts CHANGELOG template
+- Creates git commit and tag
+- Pushes to GitHub
+- Opens browser to create GitHub Release
+
+After you create the GitHub Release, GitHub Actions automatically updates the Homebrew tap formula with correct SHA256.
+
+**Documentation**:
+- [Release Workflow Guide](docs/release-workflow.md) - Complete release process
+- [Homebrew Maintenance](docs/homebrew-maintenance.md) - Homebrew-specific details
+- [GitHub Actions Setup](docs/github-actions-setup.md) - Automation configuration
 
 ## License
 

@@ -208,7 +208,27 @@ rm ~/.claude-monitor/sessions.json && echo '{}' > ~/.claude-monitor/sessions.jso
 
 ### 维护者指南
 
-**自动化 Homebrew 发布**：本项目使用 GitHub Actions 在发布新版本时自动更新 Homebrew formula。查看 [docs/homebrew-maintenance.md](docs/homebrew-maintenance.md) 了解完整的发布流程，查看 [docs/github-actions-setup.md](docs/github-actions-setup.md) 了解自动化设置。
+**自动化发布系统**：本项目包含一键发布脚本，自动化版本更新、changelog 更新和 Git 操作：
+
+```bash
+./release.sh patch  # Bug 修复 (0.2.2 → 0.2.3)
+./release.sh minor  # 新功能 (0.2.2 → 0.3.0)
+./release.sh major  # 破坏性更改 (0.2.2 → 1.0.0)
+```
+
+发布脚本自动完成：
+- 更新 VERSION 和 Formula 文件
+- 插入 CHANGELOG 模板
+- 创建 git commit 和 tag
+- 推送到 GitHub
+- 打开浏览器创建 GitHub Release
+
+在你创建 GitHub Release 后，GitHub Actions 会自动更新 Homebrew tap formula 并计算正确的 SHA256。
+
+**文档**：
+- [发布流程指南](docs/release-workflow.md) - 完整发布流程
+- [Homebrew 维护](docs/homebrew-maintenance.md) - Homebrew 相关细节
+- [GitHub Actions 设置](docs/github-actions-setup.md) - 自动化配置
 
 ## 许可证
 
