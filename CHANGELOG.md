@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2025-10-27
+
+### Added
+
+- Add release.sh: One-command version bumping and release automation
+
+### Changed
+
+- optimize readme.md
+
+### Fixed
+
+- none
+
 ## [0.2.1] - 2024-10-26
 
 ### Fixed
