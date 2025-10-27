@@ -184,9 +184,9 @@ rm ~/.claude-monitor/sessions.json && echo '{}' > ~/.claude-monitor/sessions.jso
 
 ### 获取帮助
 
-1. 查看 [docs/README.md](docs/README.md) 获取详细文档
-2. 查阅 [docs/development-guide.md](docs/development-guide.md) 了解技术细节
-3. 参见 [docs/bug-analysis.md](docs/bug-analysis.md) 了解已知问题和解决方案
+- **用户**：查看上方的[故障排除](#故障排除)章节
+- **开发者**：查阅 [docs/development-guide.md](docs/development-guide.md) 了解技术细节
+- **维护者**：参见 [docs/release-workflow.md](docs/release-workflow.md) 了解发布流程
 
 ## 卸载
 

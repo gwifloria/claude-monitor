@@ -190,9 +190,10 @@ claude-monitor/
 │   ├── swiftbar_manager.sh         # SwiftBar process management
 │   └── generate_settings.sh        # Configuration generator
 └── docs/
-    ├── README.md                   # User documentation
-    ├── development-guide.md        # Developer reference
-    └── bug-analysis.md             # Post-mortem analysis
+    ├── release-workflow.md         # Release automation guide
+    ├── homebrew-maintenance.md     # Homebrew publishing
+    ├── github-actions-setup.md     # CI/CD configuration
+    └── development-guide.md        # Developer reference
 
 Installed Locations:
 ~/.claude-monitor/                  # Runtime data and scripts
@@ -342,8 +343,6 @@ Installation intelligently merges with existing `~/.claude/settings.json`:
 ### Issue: Processing Status Persists After Time Limit ✅ FIXED
 **Cause**: When ClaudeCode reaches time limit, process may remain alive but stop triggering hooks
 **Solution**: Processing status auto-expires to idle after 30 minutes without `last_updated` changes (lib/status_manager.sh:129)
-
-See [docs/bug-analysis.md](docs/bug-analysis.md) for detailed post-mortem analysis.
 
 ## Troubleshooting
 

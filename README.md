@@ -191,9 +191,9 @@ rm ~/.claude-monitor/sessions.json && echo '{}' > ~/.claude-monitor/sessions.jso
 
 ### Getting Help
 
-1. Check [docs/README.md](docs/README.md) for detailed documentation
-2. Review [docs/development-guide.md](docs/development-guide.md) for technical details
-3. See [docs/bug-analysis.md](docs/bug-analysis.md) for known issues and solutions
+- **For Users**: Check the [Troubleshooting](#troubleshooting) section above
+- **For Developers**: Review [docs/development-guide.md](docs/development-guide.md) for technical details
+- **For Maintainers**: See [docs/release-workflow.md](docs/release-workflow.md) for release process
 
 ## Uninstall
 
