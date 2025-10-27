@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # Get the absolute path to the hook script
-HOOK_SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../hooks" && pwd)/update_status.sh"
+HOOK_SCRIPT_PATH="$HOME/.claude/hooks/update_status.sh"
 
 # Verify hook script exists
 if [[ ! -f "$HOOK_SCRIPT_PATH" ]]; then
