@@ -206,6 +206,10 @@ rm ~/.claude-monitor/sessions.json && echo '{}' > ~/.claude-monitor/sessions.jso
 
 欢迎贡献！请阅读 [docs/development-guide.md](docs/development-guide.md) 了解开发设置和编码指南。
 
+### 维护者指南
+
+**自动化 Homebrew 发布**：本项目使用 GitHub Actions 在发布新版本时自动更新 Homebrew formula。查看 [docs/homebrew-maintenance.md](docs/homebrew-maintenance.md) 了解完整的发布流程，查看 [docs/github-actions-setup.md](docs/github-actions-setup.md) 了解自动化设置。
+
 ## 许可证
 
 MIT License - 详见 LICENSE 文件

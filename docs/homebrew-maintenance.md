@@ -2,7 +2,110 @@
 
 本文档为 ClaudeCode Monitor 的维护者提供 Homebrew 发布和更新的完整流程。
 
-## 📋 发布新版本（完整流程）
+## ⚡ 推荐：自动化发布流程（GitHub Actions）
+
+**从 v0.2.2+ 开始，项目使用 GitHub Actions 自动更新 Homebrew formula，大幅简化发布流程。**
+
+### 工作原理
+
+当你在 GitHub 创建新 Release 时，GitHub Actions 会自动：
+1. 下载新版本的 tarball
+2. 计算 SHA256 checksum
+3. 更新 `gwifloria/homebrew-tap` 仓库中的 formula
+4. 提交并推送更改
+
+**完全无需手动操作 homebrew-tap 仓库！**
+
+### 一次性设置（只需执行一次）
+
+#### 1. 创建 GitHub Personal Access Token
+
+访问 https://github.com/settings/tokens/new 并创建 token：
+
+**Token 配置：**
+- Name: `HOMEBREW_TAP_TOKEN`
+- Expiration: 1 year 或 No expiration（推荐）
+- Scopes（权限）:
+  - ✅ `repo` (所有子权限)
+  - ✅ `workflow`
+
+**重要**: 创建后立即复制 token（只显示一次）
+
+#### 2. 添加 Secret 到主仓库
+
+1. 访问 https://github.com/gwifloria/claude-monitor/settings/secrets/actions
+2. 点击 **New repository secret**
+3. Name: `HOMEBREW_TAP_TOKEN`
+4. Value: 粘贴刚才创建的 token
+5. 点击 **Add secret**
+
+### 简化的发布流程（5-10 分钟）
+
+```bash
+# 1. 更新版本号
+echo "0.3.0" > VERSION
+
+# 2. 更新 Formula（仅版本号和 URL，SHA256 无需填写）
+# 编辑 Formula/claude-monitor.rb:
+#   version "0.3.0"
+#   url "https://github.com/gwifloria/claude-monitor/archive/refs/tags/v0.3.0.tar.gz"
+#   sha256 "" # 留空，GitHub Actions 会自动更新 homebrew-tap
+
+# 3. 更新 CHANGELOG.md
+
+# 4. 提交并创建 tag
+git add .
+git commit -m "Release v0.3.0"
+git tag -a v0.3.0 -m "Release version 0.3.0"
+git push origin main && git push origin v0.3.0
+
+# 5. 在 GitHub 创建 Release（参考 .github/RELEASE_TEMPLATE.md）
+# ✅ GitHub Actions 会自动更新 homebrew-tap！
+```
+
+### 验证自动化是否成功
+
+1. **检查 GitHub Actions 运行状态**:
+   - 访问 https://github.com/gwifloria/claude-monitor/actions
+   - 查看 "Update Homebrew Formula" workflow 是否成功运行
+
+2. **验证 homebrew-tap 更新**:
+   ```bash
+   # 方法1：GitHub 网页查看
+   # 访问 https://github.com/gwifloria/homebrew-tap/commits/main
+   # 应该看到一个新的提交：更新到你的版本
+
+   # 方法2：命令行查看
+   brew update
+   brew info gwifloria/tap/claude-monitor  # 检查版本是否正确
+   ```
+
+3. **测试安装**:
+   ```bash
+   brew upgrade claude-monitor
+   claude-monitor-setup
+   claude-monitor start
+   ```
+
+### 故障排除
+
+**Workflow 失败：403 错误**
+- 原因：`HOMEBREW_TAP_TOKEN` 权限不足或过期
+- 解决：重新创建 token，确保选中 `repo` 和 `workflow` 权限
+
+**Workflow 失败：SHA256 计算错误**
+- 原因：GitHub Release 未正确创建或 tarball 不存在
+- 解决：检查 Release 页面，确保 tag 对应的 Source code (tar.gz) 可下载
+
+**homebrew-tap 未更新**
+- 原因：Workflow 可能没有触发
+- 解决：手动触发 workflow 或查看 Actions 页面的错误日志
+
+---
+
+## 📋 备选：手动发布流程（不推荐）
+
+**仅在 GitHub Actions 不可用时使用。** 以下是完整的手动流程：
 
 ### 1. 准备发布
 

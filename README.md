@@ -214,6 +214,10 @@ This will:
 
 Contributions are welcome! Please read [docs/development-guide.md](docs/development-guide.md) for development setup and coding guidelines.
 
+### For Maintainers
+
+**Automated Homebrew Releases**: This project uses GitHub Actions to automatically update the Homebrew formula when a new release is published. See [docs/homebrew-maintenance.md](docs/homebrew-maintenance.md) for the complete release workflow and [docs/github-actions-setup.md](docs/github-actions-setup.md) for automation setup.
+
 ## License
 
 MIT License - See LICENSE file for details
