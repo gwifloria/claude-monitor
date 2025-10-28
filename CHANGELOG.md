@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] - 2025-10-28
+
+### Changed
+
+- feat: Add append mode to claude-monitor-setup
+
+Added third option to setup script for users with existing hooks.
+
+Changes:
+
+- Add "Append" mode to merge strategy selection
+- Set Append as default (recommended) instead of Replace
+- Update option numbering: 1=Replace, 2=Append (default), 3=Skip
+
+Before:
+
+1. Replace - Override existing hooks (recommended)
+2. Skip - Keep existing hooks (monitor won't work)
+
+After:
+
+1. Replace - Override existing hooks
+2. Append - Chain with existing hooks (recommended)
+3. Skip - Keep existing hooks only
+
+Why:
+
+- Users with existing hooks (e.g., claude_code_logger.sh) can now keep them
+- Append mode chains monitor hooks with existing hooks
+- More flexible for multi-hook configurations
+- Fixes issue where Replace would delete other useful hooks
+
+Technical:
+
+- generate_settings.sh already supported append mode
+- Only setup script UI needed updating
+- Default changed from 1 (replace) to 2 (append)
+
+Usage example:
+When user has existing hooks and chooses Append (option 2):
+UserPromptSubmit: [existing_hook, monitor_hook]
+Stop: [existing_hook, monitor_hook]
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+
 ## [0.2.3] - 2025-10-27
 
 ### Added
