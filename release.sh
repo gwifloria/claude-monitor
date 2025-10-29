@@ -168,27 +168,89 @@ update_formula() {
     log_success "$FORMULA_FILE updated"
 }
 
+# Extract commit message and generate CHANGELOG entry
+extract_commit_changelog() {
+    local version=$1
+    local date=$2
+
+    # Get commit message
+    local commit_subject=$(git log -1 --format='%s' 2>/dev/null || echo "")
+    local commit_body=$(git log -1 --format='%b' 2>/dev/null || echo "")
+
+    # Detect commit type and map to CHANGELOG section
+    local section="Changed"  # default
+    if [[ $commit_subject =~ ^feat:.*$ ]] || [[ $commit_subject =~ ^feature:.*$ ]]; then
+        section="Added"
+    elif [[ $commit_subject =~ ^fix:.*$ ]]; then
+        section="Fixed"
+    elif [[ $commit_subject =~ ^docs:.*$ ]]; then
+        section="Changed"
+    elif [[ $commit_subject =~ ^refactor:.*$ ]]; then
+        section="Changed"
+    elif [[ $commit_subject =~ ^chore:.*$ ]]; then
+        section="Changed"
+    fi
+
+    # Clean commit body (remove ClaudeCode footer and empty lines)
+    local clean_body=$(echo "$commit_body" | sed -e '/^🤖 Generated with/,$d' -e '/^$/d' -e '/^Co-Authored-By:/d')
+
+    # If body is empty or too short, use subject
+    if [[ -z "$clean_body" ]] || [[ $(echo "$clean_body" | wc -l) -lt 2 ]]; then
+        # Remove commit type prefix (e.g., "feat: " -> "")
+        local clean_subject=$(echo "$commit_subject" | sed -E 's/^[a-z]+: //')
+        clean_body="- $clean_subject"
+    else
+        # Format body content (ensure bullet points)
+        clean_body=$(echo "$clean_body" | sed '/^-/!s/^/- /')
+    fi
+
+    # Return formatted CHANGELOG entry
+    cat << EOF
+
+## [$version] - $date
+
+### $section
+
+$clean_body
+
+EOF
+}
+
+# Extract CHANGELOG content for a specific version
+extract_version_changelog() {
+    local version=$1
+
+    # Use awk to extract content between version headers
+    awk -v version="$version" '
+        /^## \['"$version"'\]/ { found=1; next }
+        found && /^## \[/ { exit }
+        found { print }
+    ' "$CHANGELOG_FILE"
+}
+
 # Insert CHANGELOG entry
 update_changelog() {
     local version=$1
     local date=$(date +%Y-%m-%d)
 
-    log_info "Updating $CHANGELOG_FILE"
+    log_info "Updating $CHANGELOG_FILE with commit message..."
 
-    # Create temporary file with new entry
+    # Create temporary file for CHANGELOG manipulation
     local temp_file=$(mktemp)
 
-    # Read existing changelog
+    # Read existing changelog or create new one
     if [[ -f "$CHANGELOG_FILE" ]]; then
         cat "$CHANGELOG_FILE" > "$temp_file"
     else
-        echo "# Changelog" > "$temp_file"
-        echo "" >> "$temp_file"
-        echo "All notable changes to ClaudeCode Monitor will be documented in this file." >> "$temp_file"
-        echo "" >> "$temp_file"
-        echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," >> "$temp_file"
-        echo "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)." >> "$temp_file"
-        echo "" >> "$temp_file"
+        cat > "$temp_file" << 'CHANGELOG_HEADER'
+# Changelog
+
+All notable changes to ClaudeCode Monitor will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+CHANGELOG_HEADER
     fi
 
     # Find the insertion point (after "## [Unreleased]" or after header)
@@ -197,7 +259,7 @@ update_changelog() {
         # Find first "##" after header
         insert_line=$(grep -n "^## " "$temp_file" | cut -d: -f1 | head -1)
         if [[ -z "$insert_line" ]]; then
-            # No existing versions, append to end
+            # No existing versions, append after header
             insert_line=$(wc -l < "$temp_file")
             insert_line=$((insert_line + 1))
         fi
@@ -205,31 +267,26 @@ update_changelog() {
         insert_line=$((insert_line + 2))
     fi
 
+    # Generate CHANGELOG entry from commit message
+    local changelog_entry=$(extract_commit_changelog "$version" "$date")
+
     # Create new changelog with inserted entry
     head -n $((insert_line - 1)) "$temp_file" > "$CHANGELOG_FILE"
-    cat >> "$CHANGELOG_FILE" << EOF
-
-## [$version] - $date
-
-### Added
-
--
-
-### Changed
-
--
-
-### Fixed
-
--
-
-EOF
+    echo "$changelog_entry" >> "$CHANGELOG_FILE"
     tail -n +$insert_line "$temp_file" >> "$CHANGELOG_FILE"
 
     rm "$temp_file"
 
-    log_success "$CHANGELOG_FILE template inserted"
-    log_warning "Please edit $CHANGELOG_FILE to add release notes"
+    # Show what was extracted
+    log_success "$CHANGELOG_FILE automatically updated from commit message"
+
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  📝 Extracted CHANGELOG Entry${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo "$changelog_entry" | sed 's/^/  /'
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
 }
 
 # Show diff preview
@@ -263,9 +320,9 @@ confirm_release() {
     fi
 }
 
-# Open editor for CHANGELOG
+# Open editor for CHANGELOG (optional manual review/edit)
 edit_changelog() {
-    log_step "Opening $CHANGELOG_FILE for editing..."
+    log_step "Opening $CHANGELOG_FILE for manual review..."
 
     # Detect editor
     local editor="${EDITOR:-vi}"
@@ -275,23 +332,40 @@ edit_changelog() {
         editor="nano"
     fi
 
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  📝 CHANGELOG Manual Review${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo "  The CHANGELOG has been auto-populated from your commit."
+    echo ""
+    echo "  You can now:"
+    echo "  • Review the extracted content"
+    echo "  • Add more details if needed"
+    echo "  • Reorganize sections"
+    echo "  • Or keep it as-is"
+    echo ""
+    echo "  ${GREEN}To proceed:${NC}"
+    echo "  1. Review/edit the content in the editor"
+    echo "  2. Save the file"
+    echo "  3. CLOSE the editor window/tab (important!)"
+    echo "  4. The script will continue automatically"
+    echo ""
+    echo -e "  ${YELLOW}⚠️  Do NOT press Ctrl+C (this will abort the release)${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
     log_info "Press Enter to open editor ($editor)..."
     read -r
 
+    echo "⏳ Waiting for you to close the editor..."
     $editor "$CHANGELOG_FILE"
+    echo "✅ Editor closed!"
 
     # Check if changes were made
     if git diff --quiet "$CHANGELOG_FILE"; then
-        log_warning "No changes made to $CHANGELOG_FILE"
-        read -p "Continue anyway? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            log_error "Release cancelled - please update CHANGELOG"
-            exit 1
-        fi
+        log_info "No additional changes made (using auto-generated content)"
+    else
+        log_success "CHANGELOG manually updated"
     fi
-
-    log_success "CHANGELOG updated"
 }
 
 # Git operations
@@ -332,6 +406,65 @@ push_changes() {
     log_success "Changes pushed to remote"
 }
 
+# Create GitHub Release using gh CLI
+create_github_release() {
+    local version=$1
+
+    log_step "Creating GitHub Release..."
+
+    # Check if gh CLI is installed
+    if ! command -v gh >/dev/null 2>&1; then
+        log_warning "gh CLI not installed - falling back to browser"
+        log_info "Install gh CLI: brew install gh"
+        open_github_release "$version"
+        return
+    fi
+
+    # Check if gh is authenticated
+    if ! gh auth status >/dev/null 2>&1; then
+        log_warning "gh CLI not authenticated - falling back to browser"
+        log_info "Run: gh auth login"
+        open_github_release "$version"
+        return
+    fi
+
+    # Generate release title (remove commit type prefix)
+    local commit_subject=$(git log -1 --format='%s')
+    local release_title=$(echo "$commit_subject" | sed -E 's/^[a-z]+: //')
+
+    # Extract CHANGELOG content for this version
+    local release_notes=$(extract_version_changelog "$version")
+
+    # If release notes are empty, use commit message
+    if [[ -z "$release_notes" ]]; then
+        release_notes="$commit_subject"
+    fi
+
+    # Create release using gh CLI
+    log_info "Creating release v$version with gh CLI..."
+
+    if echo "$release_notes" | gh release create "v$version" \
+        --title "v$version - $release_title" \
+        --notes-file - \
+        --latest; then
+
+        local release_url="$REPO_URL/releases/tag/v$version"
+        log_success "GitHub Release created successfully!"
+        log_info "Release URL: $release_url"
+
+        # Open release in browser
+        if command -v open >/dev/null 2>&1; then
+            open "$release_url"
+        elif command -v xdg-open >/dev/null 2>&1; then
+            xdg-open "$release_url"
+        fi
+    else
+        log_error "Failed to create GitHub Release"
+        log_warning "Falling back to manual release creation"
+        open_github_release "$version"
+    fi
+}
+
 # Open GitHub Release page
 open_github_release() {
     local version=$1
@@ -359,17 +492,36 @@ main() {
     echo -e "${NC}"
 
     # Check arguments
-    if [[ $# -ne 1 ]]; then
-        log_error "Usage: $0 [patch|minor|major|VERSION]"
+    if [[ $# -lt 1 ]] || [[ $# -gt 2 ]]; then
+        log_error "Usage: $0 [patch|minor|major|VERSION] [--edit]"
+        echo ""
         echo "Examples:"
-        echo "  $0 patch    # 0.2.2 → 0.2.3"
-        echo "  $0 minor    # 0.2.2 → 0.3.0"
-        echo "  $0 major    # 0.2.2 → 1.0.0"
-        echo "  $0 0.3.0    # Explicit version"
+        echo "  $0 patch         # 0.2.2 → 0.2.3 (fully automated)"
+        echo "  $0 patch --edit  # 0.2.2 → 0.2.3 (with manual CHANGELOG review)"
+        echo "  $0 minor         # 0.2.2 → 0.3.0 (fully automated)"
+        echo "  $0 major         # 0.2.2 → 1.0.0 (fully automated)"
+        echo "  $0 0.3.0         # Explicit version (fully automated)"
+        echo ""
+        echo "Automation features:"
+        echo "  • Auto-extracts commit message to CHANGELOG"
+        echo "  • Auto-creates GitHub Release with gh CLI"
+        echo "  • Use --edit flag to manually review CHANGELOG"
         exit 1
     fi
 
     local version_input=$1
+    local edit_mode=false
+
+    # Check for --edit flag
+    if [[ $# -eq 2 ]]; then
+        if [[ "$2" == "--edit" ]]; then
+            edit_mode=true
+            log_info "Edit mode enabled - CHANGELOG will be opened for manual review"
+        else
+            log_error "Invalid option: $2 (use --edit or omit)"
+            exit 1
+        fi
+    fi
 
     # Check prerequisites
     check_prerequisites
@@ -401,8 +553,13 @@ main() {
     # Show preview
     show_diff_preview
 
-    # Edit CHANGELOG
-    edit_changelog
+    # Edit CHANGELOG (only if --edit flag is set)
+    if [[ "$edit_mode" == true ]]; then
+        edit_changelog
+    else
+        log_info "Skipping manual CHANGELOG edit (using auto-extracted content)"
+        log_info "Tip: Use --edit flag to manually review CHANGELOG"
+    fi
 
     # Confirm release
     confirm_release "$current_version" "$new_version"
@@ -413,21 +570,24 @@ main() {
     # Push changes
     push_changes "$new_version"
 
+    # Create GitHub Release (or open browser if gh is not available)
+    create_github_release "$new_version"
+
     # Success message
     echo ""
     log_success "Release v$new_version completed successfully! 🎉"
     echo ""
+    log_info "What happened:"
+    echo "  ✅ Version bumped to v$new_version"
+    echo "  ✅ CHANGELOG auto-generated from commit message"
+    echo "  ✅ Changes committed and pushed to GitHub"
+    echo "  ✅ Git tag v$new_version created"
+    echo "  ✅ GitHub Release created (or browser opened)"
+    echo ""
     log_info "Next steps:"
-    echo "  1. GitHub Actions will automatically update homebrew-tap"
-    echo "  2. Create GitHub Release with release notes"
-    echo ""
-
-    # Open GitHub Release page
-    open_github_release "$new_version"
-
-    echo ""
-    log_info "Monitor GitHub Actions: $REPO_URL/actions"
-    log_info "Verify homebrew-tap: https://github.com/gwifloria/homebrew-tap/commits/main"
+    echo "  • GitHub Actions will automatically update homebrew-tap"
+    echo "  • Monitor: $REPO_URL/actions"
+    echo "  • Verify: https://github.com/gwifloria/homebrew-tap/commits/main"
     echo ""
 }
 
