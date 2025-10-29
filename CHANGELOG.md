@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.2.6] - 2025-10-29
+
+### Added
+
+- Improvements:
+- Auto-extract commit messages to CHANGELOG
+- Intelligent commit type categorization (feat→Added, fix→Fixed, etc.)
+- Auto-create GitHub Releases using gh CLI
+- Add --edit flag for optional manual review
+- Clean ClaudeCode footer from commit messages
+- Usage:
+-   ./release.sh patch         # Fully automated
+-   ./release.sh patch --edit  # With manual CHANGELOG review
+- Technical changes:
+- Add extract_commit_changelog() function
+- Add extract_version_changelog() function
+- Add create_github_release() function
+- Rewrite update_changelog() to use auto-extraction
+- Add --edit parameter support in main()
 ## [0.2.5] - 2025-10-28
 
 ### Changed
